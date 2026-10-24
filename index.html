@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#060a12">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <title>九州弈阵 · 单机版</title>
-  <link rel="stylesheet" href="css/style.css?v=20261025-1">
+  <link rel="stylesheet" href="css/style.css?v=20261025-2">
 </head>
 <body>
   <div class="bg-noise"></div>
@@ -45,6 +45,7 @@
       <h1 class="home-title">九州弈阵<span>单机版</span></h1>
       <p class="home-tagline">八人弈局 · 羁绊搭配 · 自动战斗</p>
       <p class="home-desc">无需联网，随时开局。28 位华夏英雄、10 大羁绊、8 种基础材料与 36 件传统器物，<br>与 7 个 AI 对手争夺第一。</p>
+      <p class="home-coach-note"><b>AI 教练</b> 会在对局里逐步告诉你：买谁、何时升级、何时刷新，以及每一步的原因。</p>
 
       <div class="diff-picker" id="diffPicker">
         <button data-diff="easy"><b>轻松</b><small>熟悉玩法</small></button>
@@ -117,6 +118,7 @@
       </div>
 
       <div class="top-actions">
+        <button id="coachBtn" class="coach-toggle" title="AI 教练：本地分析下一步该买谁、升级还是刷新">教练</button>
         <button id="speedBtn" title="战斗速度（1× / 2×）">1×</button>
         <button id="soundBtn" title="音效开关">♪</button>
         <button id="helpBtn" title="玩法说明">?</button>
@@ -282,6 +284,24 @@
     <div class="confetti" id="confetti"></div>
   </div>
 
+  <!-- ================= AI 教练 ================= -->
+  <aside id="coachPanel" class="coach-panel hidden" aria-label="AI 教练">
+    <div class="coach-head">
+      <div>
+        <div class="coach-kicker">LOCAL COACH · 不联网</div>
+        <h2>AI 教练 <em>逐步教你下棋</em></h2>
+      </div>
+      <button id="coachClose" class="coach-close" type="button" aria-label="关闭教练">×</button>
+    </div>
+    <div class="coach-body">
+      <div id="coachDirection" class="coach-direction"></div>
+      <div id="coachEconomy" class="coach-economy"></div>
+      <div id="coachMain" class="coach-main"></div>
+      <div id="coachSteps" class="coach-steps"></div>
+      <div id="coachNote" class="coach-note"></div>
+    </div>
+  </aside>
+
   <!-- ================= 说明 / 侦察 ================= -->
   <div id="helpModal" class="modal hidden">
     <div class="modal-backdrop" data-close="help"></div>
@@ -296,6 +316,11 @@
         <section>
           <h3>目标</h3>
           <p>你与 7 个 AI 各有 100 点生命。每回合战败会损失生命，生命归零即被淘汰。活到最后即为吃鸡。</p>
+        </section>
+        <section>
+          <h3>AI 教练</h3>
+          <p>点游戏右上角的“教练”打开本地教练。它会根据当前血量、金币、等级、商店、备战席和羁绊，告诉你下一步买哪张、是否升级、是否刷新，以及为什么。</p>
+          <p>教练完全在本机计算，不联网、不调用 DeepSeek 等外部 API；推荐只是建议，执行按钮会直接帮你完成购买/升级/刷新。</p>
         </section>
         <section>
           <h3>经济</h3>
@@ -341,6 +366,7 @@
             <li><kbd>F</kbd> 买经验</li>
             <li><kbd>1</kbd>–<kbd>5</kbd> 购买商店棋子</li>
             <li><kbd>E</kbd> 出售选中棋子</li>
+            <li><kbd>C</kbd> 打开 / 关闭 AI 教练</li>
             <li><kbd>Esc</kbd> 关闭弹窗 / 取消选择</li>
           </ul>
         </section>
@@ -366,10 +392,11 @@
   <div id="dragGhost" class="drag-ghost hidden"></div>
   <div id="battleBanner" class="battle-banner hidden"><span></span></div>
 
-  <script src="js/data.js?v=20261025-1"></script>
-  <script src="js/engine.js?v=20261025-1"></script>
-  <script src="js/game.js?v=20261025-1"></script>
-  <script src="js/ui.js?v=20261025-1"></script>
-  <script src="js/main.js?v=20261025-1"></script>
+  <script src="js/data.js?v=20261025-2"></script>
+  <script src="js/engine.js?v=20261025-2"></script>
+  <script src="js/game.js?v=20261025-2"></script>
+  <script src="js/coach.js?v=20261025-2"></script>
+  <script src="js/ui.js?v=20261025-2"></script>
+  <script src="js/main.js?v=20261025-2"></script>
 </body>
 </html>

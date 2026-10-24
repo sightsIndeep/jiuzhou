@@ -122,7 +122,10 @@
     bannerTimer: null,
     lastShopKey: '',
     suppressClick: false,
-    difficulty: 'normal'
+    difficulty: 'normal',
+    coachOpen: false,
+    coachAdvice: null,
+    coachPickIndex: -1
   };
   window.GF.UI = UI;
   window.GF.Sound = Sound;
@@ -156,6 +159,14 @@
       speedBtn: $('speedBtn'),
       soundBtn: $('soundBtn'),
       helpBtn: $('helpBtn'),
+      coachBtn: $('coachBtn'),
+      coachPanel: $('coachPanel'),
+      coachClose: $('coachClose'),
+      coachDirection: $('coachDirection'),
+      coachEconomy: $('coachEconomy'),
+      coachMain: $('coachMain'),
+      coachSteps: $('coachSteps'),
+      coachNote: $('coachNote'),
       traitList: $('traitList'),
       traitActive: $('traitActive'),
       powerVal: $('powerVal'),
@@ -271,6 +282,28 @@
     UI.els.guideBtn.addEventListener('click', () => UI.openModal('help'));
     UI.els.homeHelpBtn.addEventListener('click', () => UI.openModal('help'));
     UI.els.helpBtn.addEventListener('click', () => UI.openModal('help'));
+    UI.els.coachBtn.addEventListener('click', () => UI.toggleCoach());
+    UI.els.coachClose.addEventListener('click', () => UI.toggleCoach(false));
+    UI.els.coachPanel.addEventListener('click', e => {
+      e.stopPropagation();
+      const b = e.target.closest('[data-coach-action]');
+      if (!b || !UI.game) return;
+      const type = b.dataset.coachAction;
+      let r = null;
+      if (type === 'buy') r = UI.game.buyUnit(+b.dataset.index);
+      else if (type === 'xp') r = UI.game.buyXp();
+      else if (type === 'refresh') r = UI.game.refreshShop(true);
+      else if (type === 'equip') r = UI.game.equipItem(+b.dataset.item, b.dataset.uid);
+      else if (type === 'auto') r = UI.game.autoPlace(b.dataset.uid);
+      else if (type === 'focus') {
+        UI.selectUnit(b.dataset.uid);
+        UI.toast('已选中棋子，拖到教练建议的位置', 'info');
+        return;
+      }
+      if (r && !r.ok) UI.toast(r.msg, 'error');
+      else if (r && r.ok) UI.toast('教练建议已执行', 'success');
+      if (UI.coachOpen) UI.renderCoach();
+    });
     UI.els.scoutBtn.addEventListener('click', () => UI.openScout());
 
     document.querySelectorAll('[data-close]').forEach(el => {
@@ -438,7 +471,7 @@
     // 点击空白取消选择
     document.addEventListener('click', e => {
       if (!UI.game) return;
-      if (e.target.closest('.unit, .item-chip, .board, .bench-slot, .selected-bar, .item-slot')) return;
+      if (e.target.closest('.unit, .item-chip, .board, .bench-slot, .selected-bar, .item-slot, .coach-panel, .coach-toggle')) return;
       UI.selectUnit(null);
       UI.selectItem(null);
     });
@@ -471,7 +504,9 @@
   function bindKeyboard() {
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
-        if (!UI.els.helpModal.classList.contains('hidden') || !UI.els.scoutModal.classList.contains('hidden')) {
+        if (UI.coachOpen) {
+          UI.toggleCoach(false);
+        } else if (!UI.els.helpModal.classList.contains('hidden') || !UI.els.scoutModal.classList.contains('hidden')) {
           UI.closeModals();
         } else if (UI.resultVisible) {
           continueResult();
@@ -483,6 +518,12 @@
       }
       if (UI.isPaused()) return;
       if (!UI.game) return;
+
+      if ((e.key === 'c' || e.key === 'C') && !UI.resultVisible) {
+        e.preventDefault();
+        UI.toggleCoach();
+        return;
+      }
 
       if (UI.resultVisible) {
         if (e.code === 'Space' || e.key === 'Enter') {
@@ -526,6 +567,11 @@
     UI.battleUnits = {};
     UI.lastShopKey = '';
     UI.tooltipKey = '';
+    UI.coachOpen = false;
+    UI.coachAdvice = null;
+    UI.coachPickIndex = -1;
+    UI.els.coachPanel.classList.add('hidden');
+    UI.els.coachBtn.classList.remove('active');
 
     UI.els.homeScreen.classList.add('hidden');
     UI.els.gameScreen.classList.remove('hidden');
@@ -568,6 +614,10 @@
     UI.els.resultOverlay.classList.add('hidden');
     UI.els.helpModal.classList.add('hidden');
     UI.els.scoutModal.classList.add('hidden');
+    UI.els.coachPanel.classList.add('hidden');
+    UI.coachOpen = false;
+    UI.coachAdvice = null;
+    UI.els.coachBtn.classList.remove('active');
     UI.els.unitLayer.innerHTML = '';
     UI.els.fxLayer.innerHTML = '';
     UI.els.confetti.innerHTML = '';
@@ -771,6 +821,93 @@
   };
 
   /* ============================================================
+     AI 教练
+     ============================================================ */
+  function coachActionHtml(step, secondary) {
+    const a = step && step.action;
+    if (!a) return '';
+    const attrs = [`data-coach-action="${a.type}"`];
+    if (a.index != null) attrs.push(`data-index="${a.index}"`);
+    if (a.uid) attrs.push(`data-uid="${a.uid}"`);
+    if (a.itemIndex != null) attrs.push(`data-item="${a.itemIndex}"`);
+    return `<button type="button" class="coach-action${secondary ? ' secondary' : ''}" ${attrs.join(' ')}>${a.label}</button>`;
+  }
+
+  UI.markCoachPick = function (index) {
+    UI.coachPickIndex = index;
+    if (!UI.els || !UI.els.shopCards) return;
+    UI.els.shopCards.querySelectorAll('.shop-card').forEach((card, i) => {
+      card.classList.toggle('coach-pick', i === index);
+    });
+  };
+
+  UI.toggleCoach = function (force) {
+    if (!UI.game) { UI.toast('先开始一局，教练才有局面可看', 'info'); return; }
+    const open = force === undefined ? !UI.coachOpen : !!force;
+    UI.coachOpen = open;
+    UI.els.coachPanel.classList.toggle('hidden', !open);
+    UI.els.coachBtn.classList.toggle('active', open);
+    if (open) {
+      Sound.play('click');
+      UI.renderCoach();
+    } else {
+      UI.markCoachPick(-1);
+    }
+  };
+
+  UI.renderCoach = function () {
+    if (!UI.coachOpen || !UI.game || !window.GF.COACH) return;
+    const advice = window.GF.COACH.analyze(UI.game);
+    if (!advice) { UI.toggleCoach(false); return; }
+    UI.coachAdvice = advice;
+    const dir = advice.direction || { text: '', chips: [] };
+    UI.els.coachDirection.innerHTML = `
+      <div>${dir.text || ''}</div>
+      <div class="coach-chips">${(dir.chips || []).map(t => `<span>${t}</span>`).join('')}</div>
+    `;
+    let eco = advice.economy || '';
+    if (advice.carry) eco += ` · 主养 ${advice.carry.name}（${advice.carry.role}）`;
+    UI.els.coachEconomy.textContent = eco;
+
+    const steps = advice.steps || [];
+    const p = advice.primary || steps[0];
+    if (p) {
+      UI.els.coachMain.innerHTML = `
+        <div class="coach-primary-kicker"><i></i> 下一步 · 优先执行</div>
+        <h3>${p.title}</h3>
+        <p>${p.reason}</p>
+        ${coachActionHtml(p, false)}
+      `;
+    } else {
+      UI.els.coachMain.innerHTML = `
+        <div class="coach-primary-kicker"><i></i> 下一步</div>
+        <h3>先观察局面</h3>
+        <p>暂时没有必须执行的操作；保持经济，等商店刷新或下一回合再调整。</p>
+      `;
+    }
+
+    const rest = steps.filter(s => s !== p).slice(0, 3);
+    UI.els.coachSteps.innerHTML = rest.map((st, i) => `
+      <div class="coach-step">
+        <div class="coach-step-top">
+          <span class="coach-step-num">${i + 2}</span>
+          <h4>${st.title}</h4>
+        </div>
+        <p>${st.reason}</p>
+        ${coachActionHtml(st, true)}
+      </div>
+    `).join('');
+
+    let note;
+    if (UI.game.state.phase === 'combat') note = '<b>战斗中</b>也能买棋子和买经验；站位下回合准备阶段再调。';
+    else if (p && p.kind === 'save') note = '<b>先不操作也没关系。</b>教练优先保证经济，等对子或核心牌出现再花。';
+    else note = '<b>教练只给建议。</b>点按钮才会真的花金币；所有分析都在本机完成，不联网。';
+    UI.els.coachNote.innerHTML = note;
+
+    UI.markCoachPick(advice.pickIndex != null ? advice.pickIndex : -1);
+  };
+
+  /* ============================================================
      渲染：静态面板
      ============================================================ */
   UI.renderAll = function () {
@@ -786,6 +923,7 @@
     UI.renderPower();
     if (UI.game.state.phase === 'prep') UI.renderBoard();
     UI.renderSelected();
+    if (UI.coachOpen) UI.renderCoach();
   };
 
   UI.renderTop = function () {
