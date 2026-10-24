@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="一个完全离线的单机自走棋：28 位华夏英雄、10 大羁绊、8 种基础材料与 36 件传统器物，与 7 个 AI 对手争夺第一。">
+  <meta name="theme-color" content="#060a12">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>九州弈阵 · 单机版</title>
+  <link rel="stylesheet" href="css/style.css?v=20261025-1">
+</head>
+<body>
+  <div class="bg-noise"></div>
+
+  <!-- ================= 首页 ================= -->
+  <section id="homeScreen" class="screen home">
+    <div class="home-aura"></div>
+    <div class="home-hexfield" id="homeHexfield"></div>
+
+    <header class="home-top">
+      <div class="home-brand">
+        <svg class="brand-shovel" viewBox="0 0 64 64" aria-hidden="true">
+          <defs>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fff3c4"/>
+              <stop offset=".35" stop-color="#f5c451"/>
+              <stop offset=".7" stop-color="#c88a1e"/>
+              <stop offset="1" stop-color="#ffe7a3"/>
+            </linearGradient>
+          </defs>
+          <path d="M29.5 5h5v27h-5z" fill="url(#goldGrad)"/>
+          <rect x="26" y="27" width="12" height="5" rx="2.5" fill="url(#goldGrad)"/>
+          <path d="M19 34h26l-2.6 13.2C41.5 51.8 37.8 55 32 55s-9.5-3.2-10.4-7.8L19 34z" fill="url(#goldGrad)"/>
+          <path d="M24 38h16l-1.2 7.2c-.5 2.8-2.7 4.8-6.8 4.8s-6.3-2-6.8-4.8L24 38z" fill="#0a0f1b" opacity=".22"/>
+          <circle cx="32" cy="7" r="4.2" fill="url(#goldGrad)"/>
+        </svg>
+        <span>九州弈阵 <em>单机版</em></span>
+      </div>
+      <button class="ghost-link" id="homeHelpBtn">玩法说明</button>
+    </header>
+
+    <main class="home-center">
+      <div class="home-kicker">SINGLE PLAYER · AUTO BATTLE</div>
+      <h1 class="home-title">九州弈阵<span>单机版</span></h1>
+      <p class="home-tagline">八人弈局 · 羁绊搭配 · 自动战斗</p>
+      <p class="home-desc">无需联网，随时开局。28 位华夏英雄、10 大羁绊、8 种基础材料与 36 件传统器物，<br>与 7 个 AI 对手争夺第一。</p>
+
+      <div class="diff-picker" id="diffPicker">
+        <button data-diff="easy"><b>轻松</b><small>熟悉玩法</small></button>
+        <button data-diff="normal" class="active"><b>标准</b><small>旗鼓相当</small></button>
+        <button data-diff="hard"><b>挑战</b><small>高压上分</small></button>
+      </div>
+
+      <div class="home-actions">
+        <button id="startBtn" class="btn-gold big">开始对局 <span>→</span></button>
+        <button id="guideBtn" class="btn-ghost big">玩法说明</button>
+      </div>
+
+      <div class="home-feats">
+        <div><b>28</b><span>位英雄</span></div>
+        <div><b>10</b><span>大羁绊</span></div>
+        <div><b>36</b><span>件传统器物</span></div>
+        <div><b>7</b><span>个 AI 对手</span></div>
+      </div>
+    </main>
+
+    <footer class="home-foot">原创单机作品 · 人物取自历史与传说 · 所有内容在本机运行</footer>
+  </section>
+
+  <!-- ================= 游戏主界面 ================= -->
+  <section id="gameScreen" class="screen game hidden">
+    <header class="topbar">
+      <div class="brand-mini">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <defs>
+            <linearGradient id="goldGradMini" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fff3c4"/>
+              <stop offset=".4" stop-color="#f5c451"/>
+              <stop offset=".75" stop-color="#b98227"/>
+              <stop offset="1" stop-color="#ffe7a3"/>
+            </linearGradient>
+          </defs>
+          <path d="M29.5 5h5v27h-5z" fill="url(#goldGradMini)"/>
+          <rect x="26" y="27" width="12" height="5" rx="2.5" fill="url(#goldGradMini)"/>
+          <path d="M19 34h26l-2.6 13.2C41.5 51.8 37.8 55 32 55s-9.5-3.2-10.4-7.8L19 34z" fill="url(#goldGradMini)"/>
+        </svg>
+        <div><b>九州弈阵</b><span>单机版</span></div>
+      </div>
+
+      <div class="stage-box">
+        <span class="stage-label" id="stageLabel">1-1</span>
+        <span class="stage-type" id="stageType">野怪回合</span>
+      </div>
+
+      <div class="timer-box" id="timerBox">
+        <div class="timer-top"><span id="timerLabel">准备阶段</span><b id="timerVal">00:45</b></div>
+        <div class="timer-track"><i id="timerFill"></i></div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat">
+          <span class="stat-icon hp-icon">♥</span>
+          <div class="stat-body"><small>生命</small><b id="hpVal">100</b></div>
+          <div class="stat-track hp-track"><i id="hpFill"></i></div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon coin-icon"></span>
+          <div class="stat-body"><small>金币 <em class="interest" id="interestHint" title="每 10 金 +1 利息，最多 +5">利息 +0</em></small><b id="goldVal">6</b></div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon star-icon">✦</span>
+          <div class="stat-body"><small>等级 <em id="xpText">0 / 2</em></small><b id="levelVal">3</b></div>
+          <div class="stat-track xp-track"><i id="xpFill"></i></div>
+        </div>
+        <div class="streak-pill" id="streakPill">连胜 0</div>
+      </div>
+
+      <div class="top-actions">
+        <button id="speedBtn" title="战斗速度（1× / 2×）">1×</button>
+        <button id="soundBtn" title="音效开关">♪</button>
+        <button id="helpBtn" title="玩法说明">?</button>
+      </div>
+    </header>
+
+    <div class="game-grid">
+      <!-- 左：羁绊 -->
+      <aside class="left-panel">
+        <section class="panel traits-panel">
+          <div class="panel-title"><span>羁绊</span><em id="traitActive">0 激活</em></div>
+          <div class="trait-list" id="traitList"></div>
+        </section>
+        <section class="panel players-panel side-players">
+          <div class="panel-title"><span>对局玩家</span><em id="aliveCount">8 人存活</em></div>
+          <div class="player-list" id="playerList"></div>
+        </section>
+
+        <section class="panel power-panel">
+          <div class="power-label">阵容战力</div>
+          <b id="powerVal">0</b>
+          <div class="power-meter"><i id="powerFill"></i></div>
+          <small id="powerHint">上阵棋子提升战力</small>
+        </section>
+      </aside>
+
+      <!-- 中：棋盘 / 商店 -->
+      <main class="center">
+        <div class="board-head">
+          <div class="oppo-inline" id="oppoInline">
+            <span class="oppo-ava">?</span>
+            <div class="oppo-text"><b>野怪回合</b><small>准备战斗</small></div>
+            <div class="oppo-traits" id="oppoTraits"></div>
+          </div>
+          <div class="board-tools">
+            <span class="team-legend"><i class="ally"></i>我方 <i class="enemy"></i>敌方</span>
+            <span id="boardHint">拖拽棋子布阵</span>
+            <button id="scoutBtn" class="mini-btn">侦察</button>
+          </div>
+        </div>
+
+        <div class="board-shell" id="boardShell">
+          <div class="board" id="board">
+            <div class="board-aura"></div>
+            <div id="hexLayer" class="hex-layer"></div>
+            <div id="unitLayer" class="unit-layer"></div>
+            <div id="fxLayer" class="fx-layer"></div>
+            <div class="board-tags">
+              <span class="btag enemy">敌方半场</span>
+              <span class="btag player">己方半场 · 可布阵</span>
+            </div>
+            <div class="center-rift"></div>
+          </div>
+        </div>
+
+        <div class="board-foot">
+          <div class="board-count" id="boardCount">上阵 2 / 3</div>
+          <div class="selected-bar hidden" id="selectedBar">
+            <span class="sel-dot"></span>
+            <b id="selectedName">樊哙</b>
+            <span id="selectedStar" class="sel-star">★</span>
+            <button id="unequipBtn" class="mini-btn unequip-btn hidden">卸装备</button>
+            <button id="sellSelectedBtn" class="mini-btn danger">出售 +1</button>
+          </div>
+          <div class="ready-box">
+            <span class="key-hint">空格</span>
+            <button id="readyBtn" class="btn-gold small">开始战斗</button>
+          </div>
+        </div>
+
+        <div class="bench-panel panel bottom-bench">
+          <div class="bench-label">
+            <span>备战席 <em id="benchCount">0/9</em></span>
+            <small>拖拽 / 双击上场</small>
+          </div>
+          <div class="bench-slots" id="benchSlots"></div>
+        </div>
+
+        <div class="shop-panel panel bottom-shop" id="shopPanel">
+          <div class="shop-head">
+            <div class="shop-level">
+              <b>商店 · 等级 <span id="shopLevel">3</span></b>
+              <span class="odds" id="shopOdds">1费 75% · 2费 25%</span>
+            </div>
+            <button id="lockBtn" class="shop-lock" type="button" aria-pressed="false" title="锁定商店：下回合保留当前卡牌">
+              <span class="lock-glyph" aria-hidden="true"></span>
+              <span class="lock-copy">
+                <b class="lock-label">锁定商店</b>
+                <small class="lock-sub">下回合保留</small>
+              </span>
+            </button>
+          </div>
+          <div class="shop-main">
+            <button id="xpBtn" class="shop-side-btn side-xp"><span>买经验</span><em>4</em></button>
+            <div class="shop-cards" id="shopCards"></div>
+            <button id="refreshBtn" class="shop-side-btn side-refresh"><span>刷新</span><em>2</em></button>
+          </div>
+          <div class="sell-hint" id="sellHint">松手出售</div>
+        </div>
+      </main>
+
+      <!-- 右：备战席 / 对手 / 装备 / 战报 -->
+      <aside class="right-panel">
+        <section class="panel oppo-panel">
+          <div class="panel-title"><span>本轮对手</span><em id="oppoTag">野怪</em></div>
+          <div class="oppo-card" id="oppoCard">
+            <div class="oppo-card-empty">准备中…</div>
+          </div>
+        </section>
+
+        <section class="panel items-panel">
+          <div class="panel-title"><span>装备席</span><em id="itemCount">0 / 12</em></div>
+          <div class="item-slots" id="itemSlots"></div>
+          <div class="items-tip">拖到棋子身上 · 两件基础材料自动合成</div>
+        </section>
+
+        <section class="panel log-panel">
+          <div class="panel-title"><span>战报</span><em>LIVE</em></div>
+          <div class="log-list" id="logList"></div>
+        </section>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ================= 结算浮层 ================= -->
+  <div id="resultOverlay" class="overlay hidden">
+    <div class="result-card" id="resultCard">
+      <div class="result-kicker" id="resultKicker">第 2-1 回合</div>
+      <h2 id="resultTitle" class="result-title win">胜利</h2>
+      <p id="resultSub" class="result-sub"></p>
+      <div class="result-combat">
+        <div><span>造成伤害</span><b id="resDamageDealt">0</b></div>
+        <div><span>损失生命</span><b id="resDamageTaken">0</b></div>
+        <div><span>剩余生命</span><b id="resHp">100</b></div>
+      </div>
+      <div class="income-box">
+        <div class="income-title"><span>金币收入</span><b id="resIncomeTotal">+0</b></div>
+        <div id="resIncomeRows" class="income-rows"></div>
+      </div>
+      <div id="resItems" class="res-items"></div>
+      <div id="resNotes" class="res-notes"></div>
+      <button id="resultBtn" class="btn-gold big">继续</button>
+    </div>
+  </div>
+
+  <!-- ================= 游戏结束 ================= -->
+  <div id="gameOver" class="overlay hidden">
+    <div class="gameover-card">
+      <div class="go-kicker">本局结束 · 战绩结算</div>
+      <div class="go-place"><span>#</span><b id="goPlace">3</b></div>
+      <h2 id="goTitle">稳稳上分</h2>
+      <p id="goSub" class="go-sub">第 5-2 回合 · 标准难度</p>
+      <div class="go-stats" id="goStats"></div>
+      <div class="go-board-wrap">
+        <div class="go-board-title">最终阵容</div>
+        <div class="go-board" id="goBoard"></div>
+      </div>
+      <div class="go-actions">
+        <button id="againBtn" class="btn-gold big">再来一局</button>
+        <button id="homeBtn" class="btn-ghost big">返回首页</button>
+      </div>
+    </div>
+    <div class="confetti" id="confetti"></div>
+  </div>
+
+  <!-- ================= 说明 / 侦察 ================= -->
+  <div id="helpModal" class="modal hidden">
+    <div class="modal-backdrop" data-close="help"></div>
+    <div class="modal-card help-card">
+      <button class="modal-close" data-close="help">×</button>
+      <div class="modal-head">
+        <div class="modal-kicker">HOW TO PLAY</div>
+        <h2>九州弈阵 · 单机版</h2>
+        <p>凑阵容、升星级、调站位，在自动战斗中活到最后。</p>
+      </div>
+      <div class="help-grid">
+        <section>
+          <h3>目标</h3>
+          <p>你与 7 个 AI 各有 100 点生命。每回合战败会损失生命，生命归零即被淘汰。活到最后即为吃鸡。</p>
+        </section>
+        <section>
+          <h3>经济</h3>
+          <ul>
+            <li>每回合基础收入 5 金。</li>
+            <li>每 10 金存款 +1 利息，最多 +5。</li>
+            <li>连胜 / 连败 2 场起有额外金币。</li>
+            <li>刷新商店 2 金，买经验 4 金；战斗中也可以购买、刷新、锁定和买经验。</li>
+          </ul>
+        </section>
+        <section>
+          <h3>星级</h3>
+          <p>3 个相同 1 星棋子合成 2 星；3 个相同 2 星合成 3 星。星级越高，生命、攻击与技能数值越强。出售会返还全部投资。</p>
+          <p>开局会从 1 费池随机赠送 2 名棋子，共有 21 种组合；连续两局不会抽到完全相同的组合。</p>
+        </section>
+        <section>
+          <h3>等级</h3>
+          <p>等级 = 上阵人数，最高 10 级，也就是最终可以上阵 10 名棋子。每回合自动获得经验，也可以花 4 金买 4 点经验。</p>
+        </section>
+        <section>
+          <h3>羁绊</h3>
+          <p>上阵棋子的羁绊达到数量阈值即可激活，为全队或对应棋子提供加成。左侧面板会显示当前羁绊与档位。</p>
+        </section>
+        <section>
+          <h3>装备</h3>
+          <p>野怪回合掉落 8 种基础材料。把两件基础材料拖到同一名棋子身上会自动合成传统器物；每名棋子最多 3 个装备格。选中己方棋子后可以点击“卸装备”，把装备退回装备席（需要空位）。基础材料出售 +1 金，成品器物出售 +2 金。</p>
+        </section>
+        <section>
+          <h3>站位</h3>
+          <p>近战放前排吸收伤害，远程放后排输出。刺客开场会跃至敌方后排。拖动棋子即可调整站位。</p>
+          <p>棋盘上我方为蓝色描边/底光，敌方为红色；战斗开始后头像旁会显示“我/敌”。</p>
+        </section>
+        <section>
+          <h3>商店提示</h3>
+          <p>备战席在商店正上方；买经验是商店左侧按钮，刷新是右侧按钮。锁定按钮在商店标题行右侧，锁定时变金色，下回合保留卡牌。装备席、本轮对手和战报在右栏，玩家列表在左侧。商店卡右上角显示“已有”数量；买下能升星时卡牌变金色。</p>
+        </section>
+        <section>
+          <h3>操作</h3>
+          <ul class="keys">
+            <li><kbd>空格</kbd> 开始战斗 / 继续</li>
+            <li>点击棋子 / 敌方棋子查看详情</li>
+            <li><kbd>D</kbd> 刷新商店</li>
+            <li><kbd>F</kbd> 买经验</li>
+            <li><kbd>1</kbd>–<kbd>5</kbd> 购买商店棋子</li>
+            <li><kbd>E</kbd> 出售选中棋子</li>
+            <li><kbd>Esc</kbd> 关闭弹窗 / 取消选择</li>
+          </ul>
+        </section>
+      </div>
+      <div class="help-foot">
+        <span>小提示：把鼠标放在棋子、装备或羁绊上可以查看详细数值。</span>
+        <span class="disclaimer">原创单机作品；人物取自历史与传说，不含官方素材。</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="scoutModal" class="modal hidden">
+    <div class="modal-backdrop" data-close="scout"></div>
+    <div class="modal-card scout-card">
+      <button class="modal-close" data-close="scout">×</button>
+      <div class="scout-head" id="scoutHead"></div>
+      <div class="scout-body" id="scoutBody"></div>
+    </div>
+  </div>
+
+  <div id="tooltip" class="tooltip hidden"></div>
+  <div id="toasts" class="toasts"></div>
+  <div id="dragGhost" class="drag-ghost hidden"></div>
+  <div id="battleBanner" class="battle-banner hidden"><span></span></div>
+
+  <script src="js/data.js?v=20261025-1"></script>
+  <script src="js/engine.js?v=20261025-1"></script>
+  <script src="js/game.js?v=20261025-1"></script>
+  <script src="js/ui.js?v=20261025-1"></script>
+  <script src="js/main.js?v=20261025-1"></script>
+</body>
+</html>
