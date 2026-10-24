@@ -261,11 +261,11 @@
 
     /* ---------------- 2 费 ---------------- */
     {
-      id: 'li_bai', name: '李白', title: '青莲剑仙', glyph: '关', cost: 2,
+      id: 'li_bai', name: '李白', title: '青莲剑仙', glyph: '白', cost: 2,
       traits: ['blademaster', 'brawler'], range: 1, hp: 800, ad: 65, as: 0.8,
       armor: 35, mr: 30, mana: 60, startMana: 0, color: '#38bdf8',
       spell: {
-        name: '青莲剑歌', icon: '风',
+        name: '青莲剑歌', icon: '剑',
         text: (v, s) => `突进至目标身旁，造成 190% 攻击力 + ${v.dmg[s]} 物理伤害，并溅射周围敌人，获得 ${v.shield[s]} 护盾。`,
         vals: { dmg: [60, 90, 145], shield: [130, 195, 310] },
         cast(b, u, v) {
@@ -342,7 +342,7 @@
       traits: ['guardian', 'mystic'], range: 1, hp: 850, ad: 50, as: 0.55,
       armor: 55, mr: 45, mana: 80, startMana: 0, color: '#fcd34d',
       spell: {
-        name: '天门阵', icon: '阳',
+        name: '天门阵', icon: '门',
         text: (v, s) => `展开天门阵，获得 ${v.shield[s]} 护盾与 30 双抗，持续 5 秒，并眩晕相邻敌人 1.5 秒。`,
         vals: { shield: [330, 495, 780] },
         cast(b, u, v) {
@@ -378,7 +378,7 @@
 
     /* ---------------- 3 费 ---------------- */
     {
-      id: 'chang_e', name: '嫦娥', title: '月宫仙子', glyph: '狸', cost: 3,
+      id: 'chang_e', name: '嫦娥', title: '月宫仙子', glyph: '嫦', cost: 3,
       traits: ['mage', 'starguardian'], range: 3, hp: 750, ad: 50, as: 0.65,
       armor: 25, mr: 30, mana: 70, startMana: 0, color: '#e879f9',
       spell: {
@@ -399,7 +399,7 @@
       traits: ['assassin', 'blademaster'], range: 1, hp: 800, ad: 65, as: 0.7,
       armor: 30, mr: 30, mana: 80, startMana: 0, color: '#ef4444',
       spell: {
-        name: '连环舞', icon: '莲',
+        name: '连环舞', icon: '舞',
         text: (v, s) => `旋舞连环，对周围敌人造成 ${v.dmg[s]} 魔法伤害，并施加 50% 重伤，持续 5 秒。`,
         vals: { dmg: [240, 360, 580] },
         cast(b, u, v) {
@@ -415,7 +415,7 @@
       traits: ['guardian', 'mystic'], range: 2, hp: 900, ad: 55, as: 0.6,
       armor: 45, mr: 40, mana: 80, startMana: 0, color: '#4ade80',
       spell: {
-        name: '巾帼战阵', icon: '阵',
+        name: '巾帼战阵', icon: '巾',
         text: (v, s) => `展开巾帼战阵，对周围敌人造成 ${v.dmg[s]} 魔法伤害并禁锢 1.5 秒。`,
         vals: { dmg: [210, 315, 510] },
         cast(b, u, v) {
@@ -427,11 +427,11 @@
       }
     },
     {
-      id: 'li_guang', name: '李广', title: '飞将军', glyph: '李', cost: 3,
+      id: 'li_guang', name: '李广', title: '飞将军', glyph: '广', cost: 3,
       traits: ['marksman', 'future'], range: 4, hp: 700, ad: 85, as: 0.55,
       armor: 20, mr: 20, mana: 80, startMana: 0, color: '#e2e8f0',
       spell: {
-        name: '射石没羽', icon: '幕',
+        name: '射石没羽', icon: '弓',
         text: (v, s) => `张弓连射 4 箭，每箭造成 140% 攻击力 + ${v.dmg[s]} 物理伤害，第 4 箭必定暴击。`,
         vals: { dmg: [45, 70, 115] },
         cast(b, u, v) {
@@ -453,7 +453,7 @@
       traits: ['blademaster', 'guardian'], range: 1, hp: 900, ad: 60, as: 0.65,
       armor: 50, mr: 40, mana: 70, startMana: 0, color: '#94a3b8',
       spell: {
-        name: '负荆固守', icon: '魂',
+        name: '负荆固守', icon: '守',
         text: (v, s) => `为所有友军提供 ${v.shield[s]} 护盾，持续 4 秒；自身获得双倍护盾。`,
         vals: { shield: [190, 285, 460] },
         cast(b, u, v) {
@@ -468,7 +468,7 @@
       traits: ['brawler', 'blademaster'], range: 1, hp: 950, ad: 70, as: 0.75,
       armor: 35, mr: 30, mana: 60, startMana: 0, color: '#f59e0b',
       spell: {
-        name: '双戟破军', icon: '狂',
+        name: '双戟破军', icon: '戟',
         text: (v, s) => `进入狂战，获得 60% 攻速、30% 生命偷取并免疫控制，持续 6 秒。`,
         vals: {},
         cast(b, u) {
@@ -481,11 +481,11 @@
 
     /* ---------------- 4 费 ---------------- */
     {
-      id: 'nie_zheng', name: '聂政', title: '白虹贯日', glyph: '丽', cost: 4,
+      id: 'nie_zheng', name: '聂政', title: '白虹贯日', glyph: '聂', cost: 4,
       traits: ['assassin', 'blademaster'], range: 1, hp: 900, ad: 80, as: 0.8,
       armor: 35, mr: 35, mana: 50, startMana: 0, color: '#f43f5e',
       spell: {
-        name: '白虹刺', icon: '剑',
+        name: '白虹刺', icon: '刺',
         text: (v, s) => `连续刺杀 5 次，每次对生命最低的敌人造成 ${v.dmg[s]} 魔法伤害。`,
         vals: { dmg: [110, 165, 285] },
         cast(b, u, v) {
@@ -502,11 +502,11 @@
       }
     },
     {
-      id: 'zhuge_liang', name: '诸葛亮', title: '卧龙', glyph: '龙', cost: 4,
+      id: 'zhuge_liang', name: '诸葛亮', title: '卧龙', glyph: '诸', cost: 4,
       traits: ['mage', 'dragon'], range: 3, hp: 900, ad: 60, as: 0.6,
       armor: 30, mr: 30, mana: 90, startMana: 0, color: '#818cf8',
       spell: {
-        name: '八阵图', icon: '渊',
+        name: '八阵图', icon: '卦',
         text: (v, s) => `布下八阵图，对目标周围敌人造成 ${v.dmg[s]} 魔法伤害并眩晕 1 秒。`,
         vals: { dmg: [360, 540, 950] },
         cast(b, u, v) {
@@ -546,7 +546,7 @@
       traits: ['blademaster', 'marksman'], range: 3, hp: 850, ad: 70, as: 0.8,
       armor: 25, mr: 25, mana: 60, startMana: 0, color: '#fde68a',
       spell: {
-        name: '九日坠', icon: '翼',
+        name: '九日坠', icon: '日',
         text: (v, s) => `释放 3 道落日箭，每道对目标周围敌人造成 ${v.dmg[s]} 魔法伤害；每次施法永久获得 10% 攻速。`,
         vals: { dmg: [100, 150, 260] },
         cast(b, u, v) {
@@ -585,7 +585,7 @@
 
     /* ---------------- 5 费 ---------------- */
     {
-      id: 'guan_yu', name: '关羽', title: '武圣', glyph: '李', cost: 5,
+      id: 'guan_yu', name: '关羽', title: '武圣', glyph: '关', cost: 5,
       traits: ['brawler', 'mystic'], range: 1, hp: 1250, ad: 95, as: 0.75,
       armor: 55, mr: 50, mana: 60, startMana: 0, color: '#f59e0b',
       spell: {
